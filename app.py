@@ -1,4 +1,4 @@
-﻿import streamlit as st
+import streamlit as st
 import pandas as pd
 from microcoach.features import extract_features
 from microcoach.compare import compare_to_baselines

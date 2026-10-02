@@ -1,4 +1,4 @@
-﻿def generate_advice(user_stats, pro_stats):
+def generate_advice(user_stats, pro_stats):
     tips = []
     if user_stats.get("step_len",0) > pro_stats.get("step_len",1)*1.25:
         tips.append("Shorten your step length; add extra micro-clicks when dodging.")
