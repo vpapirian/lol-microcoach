@@ -9,8 +9,31 @@ def _speed(x, y, dt_s):
     dx = np.gradient(x); dy = np.gradient(y)
     return np.hypot(dx, dy) / dt_s
 
+REQUIRED_COLUMNS = ["time_ms", "x", "y", "is_attacking", "attack_cd"]
+MIN_SAMPLES = 3
+
+
+def validate_movement_df(df):
+    """Raise a ValueError with a readable message if df can't be analysed."""
+    missing = [c for c in REQUIRED_COLUMNS if c not in df.columns]
+    if missing:
+        raise ValueError(
+            f"Movement CSV is missing column(s): {', '.join(missing)}. "
+            f"Expected columns: {', '.join(REQUIRED_COLUMNS)}."
+        )
+    if len(df) < MIN_SAMPLES:
+        raise ValueError(
+            f"Movement CSV has {len(df)} row(s); at least {MIN_SAMPLES} are "
+            "needed to compute movement features."
+        )
+
+
 def extract_features(df, hz=10):
-    """df: columns time_ms,x,y,is_attacking,attack_cd (≈100 ms per row)."""
+    """df: columns time_ms,x,y,is_attacking,attack_cd (≈100 ms per row).
+
+    Raises ValueError if required columns are missing or there are too few rows.
+    """
+    validate_movement_df(df)
     df = df.sort_values("time_ms").reset_index(drop=True)
     dt_s = np.median(np.diff(df.time_ms.values)) / 1000.0
     if not np.isfinite(dt_s) or dt_s <= 0: dt_s = 1.0 / hz

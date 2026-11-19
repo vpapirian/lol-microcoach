@@ -10,13 +10,17 @@ user_csv = st.file_uploader("Upload YOUR parsed movement CSV", type=["csv"])
 pro_csvs = st.file_uploader("Upload PRO baseline CSV(s)", type=["csv"], accept_multiple_files=True)
 
 if user_csv and pro_csvs:
-    user_df = pd.read_csv(user_csv)
-    user_feats = extract_features(user_df)
-
-    pro_feats = []
-    for f in pro_csvs:
-        df = pd.read_csv(f)
-        pro_feats.append((f.name, extract_features(df)))
+    try:
+        user_feats = extract_features(pd.read_csv(user_csv))
+        pro_feats = []
+        for f in pro_csvs:
+            try:
+                pro_feats.append((f.name, extract_features(pd.read_csv(f))))
+            except ValueError as e:
+                raise ValueError(f"{f.name}: {e}") from e
+    except (ValueError, pd.errors.ParserError, pd.errors.EmptyDataError) as e:
+        st.error(f"Could not read the uploaded CSV: {e}")
+        st.stop()
 
     dists = compare_to_baselines(user_feats, pro_feats)
     st.subheader("Similarity to Baselines (lower = better)")
