@@ -36,6 +36,8 @@ python generate_samples.py         # creates demo CSVs in data/
 streamlit run app.py               # upload your CSV + pro CSVs
 ```
 
+Run the tests with `pip install pytest && python -m pytest`.
+
 To record your own game, run `python live_poller.py` during a match. It writes `data/live.csv`.
 
 ## 📁 Structure
